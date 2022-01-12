@@ -1,7 +1,7 @@
-var manifestData = chrome.runtime.getManifest();
+var manifestData = browser.runtime.getManifest();
 $("#version").text(manifestData.version);
 
-chrome.storage.sync.get("options", function (data) {
+browser.storage.sync.get("options", function (data) {
     if (data.options) {
         console.log(data.options);
         Object.keys(data.options).forEach(key => {
@@ -15,7 +15,7 @@ $("body").on("click", "button", function () {
     let key = $(this).attr("id");
     let old_status = $(this).val() === "true";
     let new_status = !old_status;
-    chrome.runtime.sendMessage(
+    browser.runtime.sendMessage(
         {
             command: "setOptionsValue",
             key: key,

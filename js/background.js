@@ -21,7 +21,7 @@ function onStartup() {
 }
 
 /* Handle messages and their commands from content and popup scripts*/
-chrome.runtime.onMessage.addListener(function (request, sender, response) {
+browser.runtime.onMessage.addListener(function (request, sender, response) {
     switch (request.command) {
         case "courseStorage":
             if (request.action == "add") {
@@ -61,7 +61,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
             break;
         case "setOpen":
             should_open = true;
-            chrome.tabs.create({ url: request.url });
+            browser.tabs.create({ url: request.url });
             break;
         case "shouldOpen":
             response({ open: should_open });
@@ -93,12 +93,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
 });
 
 /* Initially set the course data in storage */
-chrome.runtime.onInstalled.addListener(function (details) {
+browser.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "install") {
         setDefaultOptions();
-        chrome.storage.sync.get("savedCourses", function (data) {
+        browser.storage.sync.get("savedCourses", function (data) {
             if (!data.savedCourses) {
-                chrome.storage.sync.set({
+                browser.storage.sync.set({
                     savedCourses: [],
                 });
             }
@@ -110,7 +110,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
     }
 });
 
-chrome.storage.onChanged.addListener(function (changes) {
+browser.storage.onChanged.addListener(function (changes) {
     for (key in changes) {
         if (key === "savedCourses") {
             updateBadge(false, changes.savedCourses.newValue); // update the extension popup badge whenever the savedCourses have been changed
@@ -120,7 +120,7 @@ chrome.storage.onChanged.addListener(function (changes) {
 
 // get the value of an option if it exists
 function getOptionsValue(key, sendResponse) {
-    chrome.storage.sync.get("options", function (data) {
+    browser.storage.sync.get("options", function (data) {
         if (!data.options) {
             setDefaultOptions();
         } else {
@@ -133,7 +133,7 @@ function getOptionsValue(key, sendResponse) {
 
 // set the value of an option if it exists
 function setOptionsValue(key, value, sendResponse) {
-    chrome.storage.sync.get("options", function (data) {
+    browser.storage.sync.get("options", function (data) {
         let new_options = data.options;
         if (!data.options) {
             // if there are no options set, set the defaults
@@ -141,7 +141,7 @@ function setOptionsValue(key, value, sendResponse) {
             new_options = default_options;
         }
         new_options[key] = value;
-        chrome.storage.sync.set(
+        browser.storage.sync.set(
             {
                 options: new_options,
             },
@@ -156,9 +156,9 @@ function setOptionsValue(key, value, sendResponse) {
 
 // set the default options if the options haven't been set before
 function setDefaultOptions() {
-    chrome.storage.sync.get("options", function (data) {
+    browser.storage.sync.get("options", function (data) {
         if (!data.options) {
-            chrome.storage.sync.set(
+            browser.storage.sync.set(
                 {
                     options: default_options,
                 },
@@ -217,7 +217,7 @@ function updateBadge(first, new_changes) {
     if (new_changes) {
         updateBadgeText(first, new_changes);
     } else {
-        chrome.storage.sync.get("savedCourses", function (data) {
+        browser.storage.sync.get("savedCourses", function (data) {
             let courses = data.savedCourses;
             updateBadgeText(first, courses);
         });
@@ -228,17 +228,17 @@ function updateBadge(first, new_changes) {
 function updateBadgeText(first, courses) {
     let badge_text = courses.length > 0 ? `${courses.length}` : "";
     let flash_time = !first ? 200 : 0;
-    chrome.browserAction.setBadgeText({
+    browser.browserAction.setBadgeText({
         text: badge_text,
     });
     if (!first) {
         // if isn't the first install of the extension, flash the badge to bring attention to it
-        chrome.browserAction.setBadgeBackgroundColor({
+        browser.browserAction.setBadgeBackgroundColor({
             color: Colors.badge_flash,
         });
     }
     setTimeout(function () {
-        chrome.browserAction.setBadgeBackgroundColor({
+        browser.browserAction.setBadgeBackgroundColor({
             color: Colors.badge_default,
         });
     }, flash_time);
@@ -246,7 +246,7 @@ function updateBadgeText(first, courses) {
 
 /* Find all the conflicts in the courses and send them out/ if there is even a conflict*/
 function checkConflicts(sendResponse) {
-    chrome.storage.sync.get("savedCourses", function (data) {
+    browser.storage.sync.get("savedCourses", function (data) {
         var conflicts = [];
         var courses = data.savedCourses;
         for (let i = 0; i < courses.length; i++) {
@@ -265,7 +265,7 @@ function checkConflicts(sendResponse) {
 
 /* Find if the course at unique and with currdatearr is contained in the saved courses and if it conflicts with any other courses*/
 function isSingleConflict(currdatearr, unique, sendResponse) {
-    chrome.storage.sync.get("savedCourses", function (data) {
+    browser.storage.sync.get("savedCourses", function (data) {
         var courses = data.savedCourses;
         var conflict_list = [];
         var conflict = false;
@@ -308,12 +308,12 @@ function isConflict(adtarr, bdtarr) {
 
 /* Add the requested course to the storage*/
 function add(request, sender, sendResponse) {
-    chrome.storage.sync.get("savedCourses", function (data) {
+    browser.storage.sync.get("savedCourses", function (data) {
         var courses = data.savedCourses;
         if (!contains(courses, request.course.unique)) {
             courses.push(request.course);
             console.log(courses);
-            chrome.storage.sync.set({
+            browser.storage.sync.set({
                 savedCourses: courses,
             });
         }
@@ -326,7 +326,7 @@ function add(request, sender, sendResponse) {
 }
 /* Find and Remove the requested course from the storage*/
 function remove(request, sender, sendResponse) {
-    chrome.storage.sync.get("savedCourses", function (data) {
+    browser.storage.sync.get("savedCourses", function (data) {
         var courses = data.savedCourses;
         console.log(courses);
         var index = 0;
@@ -334,7 +334,7 @@ function remove(request, sender, sendResponse) {
             index++;
         }
         courses.splice(index, 1);
-        chrome.storage.sync.set({
+        browser.storage.sync.set({
             savedCourses: courses,
         });
         sendResponse({
@@ -347,7 +347,7 @@ function remove(request, sender, sendResponse) {
 
 /* Find if the unique is already contained within the storage*/
 function alreadyContains(unique, sendResponse) {
-    chrome.storage.sync.get("savedCourses", function (data) {
+    browser.storage.sync.get("savedCourses", function (data) {
         var courses = data.savedCourses;
         sendResponse({
             alreadyContains: contains(courses, unique),
@@ -374,9 +374,9 @@ function isSameCourse(course, unique) {
 
 // send a message to every tab open to updateit's course list (and thus recalculate its conflicts highlighting)
 function updateTabs() {
-    chrome.tabs.query({}, function (tabs) {
+    browser.tabs.query({}, function (tabs) {
         for (var i = 0; i < tabs.length; i++) {
-            chrome.tabs.sendMessage(tabs[i].id, {
+            browser.tabs.sendMessage(tabs[i].id, {
                 command: "updateCourseList",
             });
         }
@@ -388,7 +388,7 @@ function updateTabs() {
 // // updateStatus();
 
 // function updateStatus(sendResponse) {
-//     chrome.storage.sync.get("savedCourses", function (data) {
+//     browser.storage.sync.get("savedCourses", function (data) {
 //         var courses = data.savedCourses;
 //         var no_change = true;
 //         for (let i = 0; i < courses.length; i++) {
@@ -419,7 +419,7 @@ function updateTabs() {
 //             }
 //         }
 //         if (!no_change) {
-//             chrome.storage.sync.set({
+//             browser.storage.sync.set({
 //                 savedCourses: courses,
 //             });
 //             console.log("updated status");
@@ -446,7 +446,7 @@ function loadDataBase() {
 /* load the database from file */
 function loadBinaryFile(path, success) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", chrome.extension.getURL(path), true);
+    xhr.open("GET", browser.extension.getURL(path), true);
     xhr.responseType = "arraybuffer";
     xhr.onload = function () {
         var data = new Uint8Array(xhr.response);

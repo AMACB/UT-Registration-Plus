@@ -7,7 +7,7 @@ var done_loading = true;
 
 var next = $("#next_nav_link");
 if (next) {
-	chrome.runtime.sendMessage({
+	browser.runtime.sendMessage({
 		command: "getOptionsValue",
 		key: "loadAll",
 	}, function (response) {
@@ -48,7 +48,7 @@ if (!$("#kw_results_table").length) {
 }
 
 if(isIndividualCoursePage()){
-	chrome.runtime.sendMessage({
+	browser.runtime.sendMessage({
 		command: "shouldOpen",
 	}, function (response) {
 		if(response.open){
@@ -168,7 +168,7 @@ function saveCourse() {
 	let dtarr = getDayTimeArray(undefined, curr_course);
 
 	var c = new Course(full_name, unique, prof_name, dtarr, status, individual, register);
-	chrome.runtime.sendMessage({
+	browser.runtime.sendMessage({
 		command: "courseStorage",
 		course: c,
 		action: $("#saveCourse").val()
@@ -177,7 +177,7 @@ function saveCourse() {
 		$("#saveCourse").val(response.value);
 		$("#snackbar").text(response.done);
 		toggleSnackbar();
-		chrome.runtime.sendMessage({
+		browser.runtime.sendMessage({
 			command: "updateCourseList"
 		});
 	});
@@ -185,7 +185,7 @@ function saveCourse() {
 
 /* Update the course list to show if the row contains a course that conflicts with the saved course is one of the saved courses */
 function updateListConflictHighlighting(start = 0) {
-	chrome.runtime.sendMessage({
+	browser.runtime.sendMessage({
 		command: "getOptionsValue",
 		key: "courseConflictHighlight",
 	}, function (response) {
@@ -194,7 +194,7 @@ function updateListConflictHighlighting(start = 0) {
 			if (i >= start) {
 				if (!($(this).find('td').hasClass("course_header")) && $(this).has('th').length == 0) {
 					var unique = $(this).find('td[data-th="Unique"]').text();
-					chrome.runtime.sendMessage({
+					browser.runtime.sendMessage({
 						command: "isSingleConflict",
 						dtarr: getDayTimeArray(this),
 						unique: unique
@@ -289,7 +289,7 @@ function badData(course_data, res) {
 function getDistribution(course_data, sem) {
 	toggleChartLoading(true);
 	let query = buildQuery(course_data, sem);
-	chrome.runtime.sendMessage({
+	browser.runtime.sendMessage({
 		command: "gradesQuery",
 		query: query
 	}, function (response) {
@@ -362,7 +362,7 @@ function displayBasicCourseInfo(course_info){
 function openDialog(course_info, res) {
 	displayBasicCourseInfo(course_info);
 	//initial text on the "save course button"
-	chrome.runtime.sendMessage({
+	browser.runtime.sendMessage({
 		command: "alreadyContains",
 		unique: course_info["unique"]
 	}, function (response) {
@@ -465,7 +465,7 @@ function getDescription(course_info) {
 function loadNextPages(num_pages) {
 	if (num_pages === undefined) num_pages = 1;
 	if (num_pages == 0) return;
-	chrome.runtime.sendMessage({
+	browser.runtime.sendMessage({
 		command: "getOptionsValue",
 		key: "loadAll",
 	}, function (response) {
@@ -598,7 +598,7 @@ function close() {
 }
 
 /*Listen for update mssage coming from popup or calendar or other course catalog pages*/
-chrome.runtime.onMessage.addListener(
+browser.runtime.onMessage.addListener(
 	function (request, sender, sendResponse) {
 		if (request.command == "updateCourseList") {
 			updateListConflictHighlighting(0);
@@ -623,5 +623,6 @@ $(window).scroll(function () {
 
 
 $(window).on('load', function () {
+	console.log("loading pages...");
 	loadNextPages(3);
 });

@@ -4,6 +4,12 @@
     "version": "1.2.2.7",
     "options_page": "options.html",
     "description": "Improves the course registration process at the University of Texas at Austin!",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "utregistrationplus@utexas.edu",
+            "strict_min_version": "42.0"
+        }
+    },
     "permissions": [
         "storage",
         "*://*.utdirect.utexas.edu/apps/registrar/course_schedule/*",

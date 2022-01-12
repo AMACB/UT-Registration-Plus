@@ -11,7 +11,7 @@ var curr_course = {}
 
 $("#calendar").after(Template.Calendar.modal());
 
-chrome.storage.sync.get("savedCourses", function (data) {
+browser.storage.sync.get("savedCourses", function (data) {
     // Iterate through each saved course and add to 'event'
     saved_courses = data.savedCourses;
     console.log(saved_courses);
@@ -165,14 +165,14 @@ function calculateBeginningDate(full_day) {
 }
 
 function updateCalendar() {
-    chrome.storage.sync.get("savedCourses", function (data) {
+    browser.storage.sync.get("savedCourses", function (data) {
         saved_courses = data.savedCourses
         let event_source = buildEventSource(saved_courses);
         $('#calendar').fullCalendar('removeEventSources');
         $("#calendar").fullCalendar('addEventSource', event_source, true);
     });
 }
-chrome.runtime.onMessage.addListener(
+browser.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.command == "updateCourseList" || request.command == "courseAdded") {
             updateCalendar();
@@ -193,7 +193,7 @@ $("#save").click(() => {
 
 $("#clear").click(() => {
     /*Clear the list and the storage of courses*/
-    chrome.storage.sync.set({
+    browser.storage.sync.set({
         savedCourses: []
     });
     updateAllTabsCourseList();
@@ -203,7 +203,7 @@ $("#clear").click(() => {
 
 $("#remove").click(() => {
     setTimeout(() => {
-        chrome.runtime.sendMessage({
+        browser.runtime.sendMessage({
             command: "courseStorage",
             course: curr_course,
             action: "remove"

@@ -24,6 +24,7 @@ body {
     min-width: 370px;
     min-height: 400px;
     position: relative;
+    font-family: sans-serif;
 }
 
 .conflict_message{

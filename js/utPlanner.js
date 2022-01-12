@@ -1,7 +1,7 @@
 let semester_code = "";
 curr_course = {}
 
-chrome.runtime.sendMessage({
+browser.runtime.sendMessage({
     command: "currentSemesters"
 }, function(response){
     let semester_text = $('.row:contains(Semester)').find('span').text();
@@ -151,7 +151,7 @@ function buildSemestersDropdown(course_data, res) {
 function getDistribution(course_data, sem) {
     toggleChartLoading(true);
     let query = buildQuery(course_data, sem);
-    chrome.runtime.sendMessage({
+    browser.runtime.sendMessage({
         command: "gradesQuery",
         query: query
     }, function (response) {

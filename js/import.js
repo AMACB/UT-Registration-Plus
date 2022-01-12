@@ -72,12 +72,12 @@ function buildAddCourse(link) {
 	$.get(link, function (response) {
 		if (response) {
 			let simp_course = buildSimplifiedCourseObject(response, link);
-			chrome.runtime.sendMessage({
+			browser.runtime.sendMessage({
 				command: "courseStorage",
 				course: simp_course,
 				action: "add"
 			}, function () {
-				chrome.runtime.sendMessage({
+				browser.runtime.sendMessage({
 					command: "updateCourseList"
 				});
 			});

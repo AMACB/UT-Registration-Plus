@@ -8,7 +8,7 @@ var can_remove = true;
 
 function setCourseList() {
     $("#courseList").empty();
-    chrome.storage.sync.get("savedCourses", function (data) {
+    browser.storage.sync.get("savedCourses", function (data) {
         updateConflicts();
         courses = data.savedCourses;
         handleEmpty();
@@ -54,7 +54,7 @@ function buildTimeLines(datetimearr) {
 
 /* Update the conflict messages */
 function updateConflicts() {
-    chrome.runtime.sendMessage(
+    browser.runtime.sendMessage(
         {
             command: "checkConflicts",
         },
@@ -96,7 +96,7 @@ $(document).click(function (event) {
 });
 
 $("#clear").click(function () {
-    chrome.storage.sync.set({
+    browser.storage.sync.set({
         savedCourses: [],
     });
     $("#courseList").empty();
@@ -105,13 +105,13 @@ $("#clear").click(function () {
 });
 
 $("#RIS").click(function () {
-    chrome.tabs.create({
+    browser.tabs.create({
         url: "https://utdirect.utexas.edu/registrar/ris.WBX",
     });
 });
 
 $("#calendar").click(function () {
-    chrome.tabs.create({
+    browser.tabs.create({
         url: "calendar.html",
     });
 });
@@ -155,7 +155,7 @@ $("#import_input").change(function (e) {
         try {
             var imported_courses = JSON.parse(this.result);
             if (isImportedValid(imported_courses)) {
-                chrome.storage.sync.set({
+                browser.storage.sync.set({
                     savedCourses: imported_courses,
                 });
                 updateAllTabsCourseList();
@@ -186,7 +186,7 @@ function createBlob(export_courses) {
 }
 
 $("#export-class").click(function () {
-    chrome.storage.sync.get("savedCourses", function (data) {
+    browser.storage.sync.get("savedCourses", function (data) {
         let export_courses = data.savedCourses;
         if (export_courses.length > 0) {
             let url = window.URL.createObjectURL(createBlob(export_courses));
@@ -205,7 +205,7 @@ function openSearch(semester, department, level, courseCode) {
     } else {
         link = `https://utdirect.utexas.edu/apps/registrar/course_schedule/${semester}/results/?fos_fl=${department}&level=${level}&search_type_main=FIELD`;
     }
-    chrome.tabs.create({ url: link });
+    browser.tabs.create({ url: link });
 }
 
 $("#search-class").click(() => {
@@ -217,7 +217,7 @@ $("#search-class").click(() => {
 });
 
 $("#options_button").click(function () {
-    chrome.tabs.create({
+    browser.tabs.create({
         url: "options.html",
     });
 });
@@ -288,7 +288,7 @@ function handleRemove(clicked_item, curr_course) {
                         $(clicked_item).remove();
                     });
                 subtractHours(curr_course);
-                chrome.runtime.sendMessage(
+                browser.runtime.sendMessage(
                     {
                         command: "courseStorage",
                         course: curr_course,
@@ -404,7 +404,7 @@ function showImportExportPopup() {
 }
 
 function getSemesters() {
-    chrome.runtime.sendMessage(
+    browser.runtime.sendMessage(
         {
             command: "currentSemesters",
         },
@@ -420,7 +420,7 @@ function getSemesters() {
 }
 
 function getDepartments() {
-    chrome.runtime.sendMessage(
+    browser.runtime.sendMessage(
         {
             command: "currentDepartments",
         },

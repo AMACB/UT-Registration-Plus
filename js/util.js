@@ -119,9 +119,9 @@ function isIndividualCoursePage(){
 
 
 function updateAllTabsCourseList() {
-    chrome.tabs.query({}, function (tabs) {
+    browser.tabs.query({}, function (tabs) {
         for (var i = 0; i < tabs.length; i++) {
-            chrome.tabs.sendMessage(tabs[i].id, {
+            browser.tabs.sendMessage(tabs[i].id, {
                 command: "updateCourseList"
             });
         }
@@ -133,18 +133,18 @@ function htmlToNode(response) {
 }
 
 function setCurrentTabUrl(link) {
-    chrome.tabs.query({
+    browser.tabs.query({
         currentWindow: true,
         active: true
     }, function (tab) {
-        chrome.tabs.update(tab.id, {
+        browser.tabs.update(tab.id, {
             url: link
         });
     });
 }
 
 function openMoreInfoWithOpenModal(link){
-    chrome.runtime.sendMessage({ command: "setOpen", url: link });
+    browser.runtime.sendMessage({ command: "setOpen", url: link });
 }
 
 
